@@ -1,0 +1,109 @@
+include "diagnostics/gouv_test_runner.hpp"
+#include "diagnostics/test_logger.hpp"
+
+GouvTestRunner::GouvTestRunner(GouvService& gouv) : gouv_(gouv) {}
+
+TestResult GouvTestRunner::runConfigureOnly() {
+    diag::title("Gouvernes configure test");
+    if (!gouv_.configureAll()) return TestResult::failure("Gouvernes configureAll failed");
+    diag::ok("Gouvernes configured");
+    return TestResult::success("Gouvernes configure passed");
+}
+
+TestResult GouvTestRunner::runHomingOnly() {
+    diag::title("Gouvernes homing test");
+    if (!gouv_.startHomingAll()) return TestResult::failure("Gouvernes startHomingAll failed");
+    diag::ok("Gouvernes homing command sent");
+    return TestResult::success("Gouvernes homing passed");
+}
+
+TestResult GouvTestRunner::runOperationalOnly() {
+    diag::title("Gouvernes operational test");
+    if (!gouv_.setOperationalAll()) return TestResult::failure("Gouvernes setOperationalAll failed");
+    diag::ok("Gouvernes operational command sent");
+    return TestResult::success("Gouvernes operational passed");
+}
+
+TestResult GouvTestRunner::runMoveRaw(std::int32_t rawPosition) {
+    diag::title("Gouvernes move raw-position test");
+    if (!gouv_.moveAllToRawPosition(rawPosition)) return TestResult::failure("Gouvernes moveAllToRawPosition failed");
+    diag::ok("Gouvernes move command sent");
+    return TestResult::success("Gouvernes move passed");
+}
+
+
+
+
+
+
+include "diagnostics/motor_test_runner.hpp"
+#include "diagnostics/test_logger.hpp"
+
+MotorTestRunner::MotorTestRunner(MotorService& motor) : motor_(motor) {}
+
+TestResult MotorTestRunner::runConfigureOnly() {
+    diag::title("Motor configure-only test");
+    diag::step("MotorService::configure()");
+    if (!motor_.configure()) return TestResult::failure("Motor configure failed");
+    diag::ok("Motor configured");
+    return TestResult::success("Motor configure-only passed");
+}
+
+TestResult MotorTestRunner::runStartStopOnly() {
+    diag::title("Motor start-stop test");
+    diag::step("MotorService::start()");
+    if (!motor_.start()) return TestResult::failure("Motor start failed");
+    diag::ok("Motor started");
+
+    diag::step("MotorService::stop()");
+    if (!motor_.stop()) return TestResult::failure("Motor stop failed");
+    diag::ok("Motor stopped");
+
+    return TestResult::success("Motor start-stop passed");
+}
+
+TestResult MotorTestRunner::runFullTest(std::int32_t rpm) {
+    diag::title("Motor full test");
+    if (!motor_.configure()) return TestResult::failure("Motor configure failed");
+    diag::ok("Motor configured");
+
+    if (!motor_.start()) return TestResult::failure("Motor start failed");
+    diag::ok("Motor started");
+
+    if (!motor_.setTargetSpeed(rpm)) return TestResult::failure("Motor setTargetSpeed failed");
+    diag::ok("Motor target speed sent");
+
+    if (!motor_.stop()) return TestResult::failure("Motor stop failed");
+    diag::ok("Motor stopped");
+
+    return TestResult::success("Motor full test passed");
+}
+
+
+include "diagnostics/power_test_runner.hpp"
+#include "diagnostics/test_logger.hpp"
+
+PowerTestRunner::PowerTestRunner(PowerService& power) : power_(power) {}
+
+TestResult PowerTestRunner::runStartupOnly() {
+    diag::title("Power startup test");
+    if (!power_.startup()) return TestResult::failure("Power startup failed");
+    diag::ok("Power startup passed");
+    return TestResult::success("Power startup passed");
+}
+
+TestResult PowerTestRunner::runShutdownOnly() {
+    diag::title("Power shutdown test");
+    if (!power_.shutdownNominal()) return TestResult::failure("Power shutdown failed");
+    diag::ok("Power shutdown passed");
+    return TestResult::success("Power shutdown passed");
+}
+
+TestResult PowerTestRunner::runStartupShutdown() {
+    diag::title("Power startup + shutdown test");
+    if (!power_.startup()) return TestResult::failure("Power startup failed");
+    diag::ok("Power startup passed");
+    if (!power_.shutdownNominal()) return TestResult::failure("Power shutdown failed");
+    diag::ok("Power shutdown passed");
+    return TestResult::success("Power startup + shutdown passed");
+}
