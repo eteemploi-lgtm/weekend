@@ -1,0 +1,12 @@
+ifndef COMMUNICAN_SENSOR_TEST_RUNNER_HPP
+#define COMMUNICAN_SENSOR_TEST_RUNNER_HPP
+#include "services/sensor_service.hpp"
+#include "diagnostics/test_result.hpp"
+class SensorTestRunner {
+public:
+    explicit SensorTestRunner(SensorService& sensors);
+    TestResult runRefreshOnly();
+private:
+    SensorService& sensors_;
+};
+#endif
