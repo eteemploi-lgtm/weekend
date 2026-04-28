@@ -1,0 +1,12 @@
+#include "diagnostics/sensor_test_runner.hpp"
+#include "diagnostics/test_logger.hpp"
+
+SensorTestRunner::SensorTestRunner(SensorService& sensors) : sensors_(sensors) {}
+
+TestResult SensorTestRunner::runRefreshOnly() {
+    diag::title("Sensor refresh test");
+    if (!sensors_.refresh()) return TestResult::failure("SensorService::refresh failed");
+    diag::ok("Sensor refresh passed");
+    diag::warn("This validates the C++ pipeline only. Real CAN decoding must be checked through ReadDataCan/DataValidation.");
+    return TestResult::success("Sensor refresh passed");
+}
